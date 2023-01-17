@@ -16,9 +16,11 @@
     "react-dom": "^18.2.0",
     "react-paginate": "^8.1.4",
     "react-to-print": "^2.14.11",
-    "sweetpagination": "^1.0.15"
+    "sweetpagination": "^1.0.15",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.5",
     "@types/react": "^18.0.24",
     "@types/react-dom": "^18.0.8",
     "@vitejs/plugin-react": "^2.2.0",
