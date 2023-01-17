@@ -11,11 +11,13 @@ import './App.css'
 import { Dropdown,IDropdownStyles, IDropdownOption } from '@fluentui/react/lib/Dropdown';
 import { ChoiceGroup, IChoiceGroupOption } from '@fluentui/react/lib/ChoiceGroup';
 import { IconButton } from '@fluentui/react/lib/Button';
+import {ExportCSV} from './ExportCSV';
 const ChevronLeftSmall: IIconProps = { iconName: 'ChevronLeftSmall' };
 const ChevronRightSmall: IIconProps = { iconName: 'ChevronRightSmall' };
 const ChevronLeftEnd6: IIconProps = { iconName: 'ChevronLeftEnd6' };
 const ChevronRightEnd6: IIconProps = { iconName: 'ChevronRightEnd6' };
-// const ExcelDocument: IIconProps = { iconName: 'ExcelDocument' };
+const ExcelDocument: IIconProps = { iconName: 'ExcelDocument' };
+// const PDF: IIconProps = { iconName: 'PDF' };
 const dropdownStyles: Partial<IDropdownStyles> = {
   dropdown: { width: 300},
 };
@@ -88,6 +90,7 @@ export interface IDetailsListBasicExampleState {
   currentPage: number,
   todosPerPage: number
   count : number
+  fileName : string
   // disabled : boolean
   // green : boolean
   // count: number
@@ -127,6 +130,7 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
       currentPage: 1,
       todosPerPage: 5,
       count : 1,
+      fileName : 'TechnicalAdda'
       // disabled : false
       // green : true
       // count: 0
@@ -302,18 +306,17 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
           {">>"}
         </IconButton>
         </div>
-        <div  style={{textAlign : "right" , display : "grid" , width:"70px" , right : '70px'}}>
+        <div className='lowerlist' style={{textAlign : "right" , display : "grid" , width:"70px" , right : '70px'}}>
         <Dropdown
         style={{fontSize : "18px"}}
         placeholder='5'
         options={options_element}
         onChange = {this.select_element}
         />
-        {/* <IconButton iconProps={ExcelDocument} aria-label="ExcelDocument" style={{color : "green"}}/> */}
+        <ExportCSV csvData={this.state.list} fileName={this.state.fileName} />
         </div>
-        {/* <IconButton iconProps={View} aria-label="InternetSharing"/> */}
+        {/* <ExportCSV csvData={this.state.list} fileName={this.state.fileName} /> */}
       </Stack>
-      
     )
   }
   cont (){  
@@ -413,7 +416,6 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
   //     })
   //   }
   // }
-
   updateitem(){
     // console.log(this.state.selectv)
     this.setState({Dateform:this.state.selectv,isEditing:true})

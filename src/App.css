@@ -74,7 +74,9 @@
   background-color: #007bff
   ;
 }
-
+.BTN1{
+  background-color: black;
+}
 /* .formaze .pagination:disabled{
   background-color: #0078d4;
 } */
