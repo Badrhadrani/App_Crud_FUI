@@ -25,6 +25,9 @@ export const ExportCSV : React.FunctionComponent<IExportCSVprops> = ({csvData  ,
         iconProps={ExcelDocument} aria-label="ExcelDocument"
         className='Excel'
         text='Export'
+        styles={{
+            icon: {color: '#217346', fontSize: 25},
+        }}
         ></ActionButton>
     )
 }

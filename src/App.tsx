@@ -4,7 +4,7 @@ import { TextField, ITextFieldStyles } from '@fluentui/react/lib/TextField';
 import { DetailsList, DetailsListLayoutMode, Selection, IColumn } from '@fluentui/react/lib/DetailsList';
 import { MarqueeSelection } from '@fluentui/react/lib/MarqueeSelection';
 import { mergeStyles } from '@fluentui/react/lib/Styling';
-import { Stack, IStackTokens, List, initializeIcons, IIconProps } from '@fluentui/react';
+import { Stack, IStackTokens, List, initializeIcons, IIconProps, Icon } from '@fluentui/react';
 import {ActionButton, DefaultButton, PrimaryButton } from '@fluentui/react/lib/Button';
 import {IStackProps, IStackStyles } from '@fluentui/react/lib/Stack';
 import './App.css'
@@ -42,9 +42,6 @@ const View: IIconProps = { iconName: 'View' };
 const AddFriend: IIconProps = { iconName: 'AddFriend' ,};
 const Edit: IIconProps = { iconName: 'Edit' ,};
 const UserSync : IIconProps = {iconName : 'UserSync',};
-const dropdownStyles: Partial<IDropdownStyles> = {
-  dropdown: { width: 300},
-};
 initializeIcons();
 const optionssex: IChoiceGroupOption[] = [
   { key: 'H', text: 'Homme' },
@@ -85,9 +82,9 @@ const options_element: IDropdownOption[] = [
   { key: '40', text: '40' },
   { key: '50', text: '50' },
 ];
-// const dropdownStyles1: Partial<IDropdownStyles> = {
-//   dropdown: { width: 90 ,}
-// };
+const dropdownStyles: Partial<IDropdownStyles> = {
+  dropdown: { width: 240 , right: 29 },
+};
 export interface IDetailsListBasicExampleItem {
   id: string;
   key: number;
@@ -285,18 +282,36 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
         <Stack horizontal tokens={stackTokens}>
         <ExportCSV csvData={this.state.list} fileName={this.state.fileName} />
         {/* <DefaultButton text="Cancel" onClick={this.ClearForm} style={{background:"white", color:"black",display: "inline"}}  allowDisabledFocus/> */}
-        <ActionButton  iconProps={Add} aria-label="Add"  text="Add" onClick={this.togglePopup} style={{marginLeft:"200px" , fontSize : "17px"}}allowDisabledFocus/>
+        <ActionButton  iconProps={Add} aria-label="Add" onClick={this.togglePopup}  text="Add"  
+        style={{marginLeft:"200px" , fontSize : "17px"}}
+        styles={{
+          icon: {color: '#0078d4', fontSize: 25},
+        }}
+        allowDisabledFocus/>
         <ActionButton iconProps={Edit} aria-label="Edit" 
+        styles={{
+        icon: {color: '#c239b3', fontSize: 25},
+        }}
         text="Update"
+        onClick={this.state.isEditing ? this.updatePopup : this.updateitem}
         // text={this.state.isEditing ? "Mise à jour" : "Update"}
         // onClick={this.state.isEditing ?this.Miseajour : this.updateitem}
-        onClick={this.updatePopup}
+        // onClick={this.updatePopup}
         style={{color:"black",display: "inline",marginLeft:"200px" , fontSize:"17px"}}
         allowDisabledFocus
         />
-        <ActionButton iconProps={Delete} aria-label="Delete" text="Delete"onClick={this._onDeleteRow} style={{color:"black",display: "inline",marginLeft:"200px",fontSize : "17px"}} allowDisabledFocus/>
+        <ActionButton iconProps={Delete} aria-label="Delete" text="Delete"
+        onClick={this._onDeleteRow} 
+        style={{color:"black",display: "inline",marginLeft:"200px",fontSize : "17px"}} 
+        styles={{
+          icon: {color: '#d13438', fontSize: 25},
+          }}
+        allowDisabledFocus/>
         <ActionButton iconProps={View} aria-label="View" text="View"  onClick={this.view}
         style={{ color:"black",display: "inline",marginLeft:"200px",fontSize : "17px"}} 
+        styles={{
+          icon: {color: '#6bb700', fontSize: 25},
+        }}
         allowDisabledFocus/>
         </Stack>
         <Announced message={`Number of items after filter applied: ${items.length}.`} />
@@ -504,7 +519,7 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
             />
           </div>
           <DefaultButton onClick={this.updatePopup} style={{background:"#a4262c", color:"white",display: "inline" , border : "#a4262c"}}>Close</DefaultButton>
-          <DefaultButton onClick={this.handleAddClick} style={{display: "inline" , margin : "15px" , background : "#0c5f32", color : "white" , border : "#0c5f32"}}>Mise a jour </DefaultButton>
+          <DefaultButton onClick={this.Miseajour} style={{display: "inline" , margin : "15px" , background : "#0c5f32", color : "white" , border : "#0c5f32"}}>Mise a jour </DefaultButton>
           <DefaultButton text="Cancel" onClick={this.ClearForm} style={{background:"white", color:"black",display: "inline" , margin : "3px"}}  allowDisabledFocus/>
           </div>
             </FocusTrapZone>
@@ -571,8 +586,12 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
     this.setState({Dateform:{...this.state.Dateform},
     list:[...this.state.list, this.state.Dateform]
     })
+    this.setState({
+      showPopup: !this.state.showPopup,
+    });
     this.setState({Dateform:{id:this.cont(),name:"",prenom:"",age:0,email:"",sexe:"",adresse:"",ville:""}})
-    this._alllist = this.state.list
+    // this._alllist = this.state.list
+
   }
   ClearForm(){
     this.setState({Dateform:{id:1,name:"",prenom:"",age:0,email:"",sexe:"",adresse:"",ville:""}})
@@ -610,15 +629,8 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
     this.setState({Dateform:this.state.selectv,isEditing:true})
   }
   Miseajour(e:any){
-    // e.preventDefault();
     let list1 = this.state.list;
-    // for (const item of list1){
-    //   if(this.state.selectv.id== item.id){
-    //     console.log(item.id)
-    //   }
-    // }
     for (var i = 0; i < list1.length; i++) {
-      // console.log(list1[i].id);
       if(this.state.selectv.id== list1[i].id){
         list1[i]= this.state.Dateform
       }
@@ -631,6 +643,9 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
         isEditing:false,
     });
     this._alllist = this.state.list
+    this.setState({
+      upPopup: !this.state.upPopup,
+    });
   }
   handleClick = (event:any) => {
     console.log("dcdcdijcd",event.target.id)
