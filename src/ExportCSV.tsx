@@ -2,7 +2,7 @@ import React from 'react'
 import * as FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
 import { IIconProps, PrimaryButton } from '@fluentui/react';
-import { DefaultButton, IconButton } from '@fluentui/react/lib/Button';
+import { ActionButton, DefaultButton, IconButton } from '@fluentui/react/lib/Button';
 const ExcelDocument: IIconProps = { iconName: 'ExcelDocument' };
 interface IExportCSVprops{
     csvData : any
@@ -19,12 +19,13 @@ export const ExportCSV : React.FunctionComponent<IExportCSVprops> = ({csvData  ,
     FileSaver.saveAs(data, fileName + fileExtension);
     }
     return (
-        <DefaultButton  
+        <ActionButton  
         onClick={(e) => exportToCSV(csvData,fileName)}
-        style={{background:"white", color:"green", fontSize: "14px" , display : "flow-root" , border : "2px solid green" , width : "35px" , height : "35px"}}
+        style={{background:"white",fontSize: "17px" , marginLeft : "10px"}}
         iconProps={ExcelDocument} aria-label="ExcelDocument"
         className='Excel'
-        >Export</DefaultButton>
+        text='Export'
+        ></ActionButton>
     )
 }
 

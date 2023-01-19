@@ -12,12 +12,36 @@ import { Dropdown,IDropdownStyles, IDropdownOption } from '@fluentui/react/lib/D
 import { ChoiceGroup, IChoiceGroupOption } from '@fluentui/react/lib/ChoiceGroup';
 import { IconButton } from '@fluentui/react/lib/Button';
 import {ExportCSV} from './ExportCSV';
-const ChevronLeftSmall: IIconProps = { iconName: 'ChevronLeftSmall' };
+import { mergeStyleSets,  FocusTrapZone, Layer, Overlay, Popup } from '@fluentui/react';
+const popupStyles = mergeStyleSets({
+  root: {
+    background: 'rgba(0, 0, 0, 0.2)',
+    bottom: '0',
+    left: '0',
+    position: 'fixed',
+    right: '0',
+    top: '0',
+  },
+  content: {
+    background: 'white',
+    left: '49%',
+    maxWidth: '896px',
+    padding: '0 2em 2em',
+    position: 'absolute',
+    top: '50%',
+    transform: 'translate(-50%, -50%)',
+  },
+});
+const ChevronLeftSmall: IIconProps = { iconName: 'ChevronLeftSmall' ,};
 const ChevronRightSmall: IIconProps = { iconName: 'ChevronRightSmall' };
 const ChevronLeftEnd6: IIconProps = { iconName: 'ChevronLeftEnd6' };
 const ChevronRightEnd6: IIconProps = { iconName: 'ChevronRightEnd6' };
-const ExcelDocument: IIconProps = { iconName: 'ExcelDocument' };
-// const PDF: IIconProps = { iconName: 'PDF' };
+const Add: IIconProps = { iconName: 'Add' };
+const Delete: IIconProps = { iconName: 'Delete' };
+const View: IIconProps = { iconName: 'View' };
+const AddFriend: IIconProps = { iconName: 'AddFriend' ,};
+const Edit: IIconProps = { iconName: 'Edit' ,};
+const UserSync : IIconProps = {iconName : 'UserSync',};
 const dropdownStyles: Partial<IDropdownStyles> = {
   dropdown: { width: 300},
 };
@@ -91,6 +115,9 @@ export interface IDetailsListBasicExampleState {
   todosPerPage: number
   count : number
   fileName : string
+  showPopup : boolean
+  upPopup : boolean
+  // title : string
   // disabled : boolean
   // green : boolean
   // count: number
@@ -130,7 +157,10 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
       currentPage: 1,
       todosPerPage: 5,
       count : 1,
-      fileName : 'TechnicalAdda'
+      fileName : 'listelement',
+      showPopup : false,
+      upPopup : false
+      // title : "Add Nouvaeu User"
       // disabled : false
       // green : true
       // count: 0
@@ -149,6 +179,8 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
     this.previousQuestion = this.previousQuestion.bind(this)
     this.precedentelement = this.precedentelement.bind(this)
     this.suivantelement = this.suivantelement.bind(this)
+    this.togglePopup = this.togglePopup.bind(this)
+    this.updatePopup = this.updatePopup.bind(this)
   }
   public render(): JSX.Element {
     const { items, selectionDetails } = this.state; 
@@ -187,27 +219,27 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
       <Stack className="formaze" >
         <div className={exampleChildClass}>{selectionDetails}</div>
         <Announced message={selectionDetails} />
-          <div className="fields">
+          {/* <div className="fields">
             <Stack {...columnProps} >
             <TextField label="Name" styles={{fieldGroup:{width : 280}}}
             placeholder="Entrer First Name"
             value={this.state.Dateform.name}
             onChange={(e:any)=>this.setState({Dateform:{...this.state.Dateform,name:e.target.value}})}
-            required/>
+            />
             </Stack>
             <Stack {...columnProps} >
             <TextField label="Prenom" styles={{fieldGroup:{width : 280}}} 
             placeholder="Entrer First Prenom"
             value={this.state.Dateform.prenom}
             onChange={(e:any)=>this.setState({Dateform:{...this.state.Dateform,prenom:e.target.value}})}
-            required/>
+            />
             </Stack>
             <Stack {...columnProps} >
             <TextField label="Age"  styles={{fieldGroup:{width : 280}}} type="number"
             placeholder="Entrer First Age"
             value={this.state.Dateform.age.toString()}
             onChange={(e:any)=>this.setState({Dateform:{...this.state.Dateform,age:e.target.value}})}
-            required/>
+            />
             </Stack> 
           </div>
           <div className="fields">
@@ -216,7 +248,7 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
             placeholder="Entrer First Email"
             value={this.state.Dateform.email}
             onChange={(e:any)=>this.setState({Dateform:{...this.state.Dateform,email:e.target.value}})}
-            required/>
+            />
             </Stack>
             <Stack tokens={stackTokensD}>
             <Dropdown
@@ -226,7 +258,7 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
             styles={dropdownStyles}
             onChange={this.getvalueVille}
             defaultSelectedKey={this.state.Dateform.ville}
-            required/>
+            />
             </Stack>
             <Stack>
             <Stack {...columnProps}>
@@ -234,7 +266,7 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
             styles={{fieldGroup:{width : 280}}}
             value={this.state.Dateform.adresse}
             onChange={(e:any)=>this.setState({Dateform:{...this.state.Dateform,adresse:e.target.value}})}
-            required/>
+            />
             </Stack>
             </Stack>
           </div>
@@ -242,8 +274,8 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
             <ChoiceGroup  
             options={optionssex} label="Sexe" 
             onChange={this._onChange}
-            required/>
-        </div>
+            />
+          </div> */}
         <TextField
           className={exampleChildClass}
           label="Search"
@@ -251,14 +283,20 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
           styles={textFieldStyles}
         />
         <Stack horizontal tokens={stackTokens}>
-        <DefaultButton text="Cancel" onClick={this.ClearForm} style={{background:"white", color:"black",display: "inline"}}  allowDisabledFocus/>
-        <PrimaryButton  text="Add" onClick={this.handleAddClick} style={{marginLeft:"200px"}}allowDisabledFocus/>
-        <DefaultButton text={this.state.isEditing ? "Mise à jour" : "Update"} onClick={this.state.isEditing ?this.Miseajour : this.updateitem} style={{background:"#217346", color:"white",display: "inline",marginLeft:"200px"}}
+        <ExportCSV csvData={this.state.list} fileName={this.state.fileName} />
+        {/* <DefaultButton text="Cancel" onClick={this.ClearForm} style={{background:"white", color:"black",display: "inline"}}  allowDisabledFocus/> */}
+        <ActionButton  iconProps={Add} aria-label="Add"  text="Add" onClick={this.togglePopup} style={{marginLeft:"200px" , fontSize : "17px"}}allowDisabledFocus/>
+        <ActionButton iconProps={Edit} aria-label="Edit" 
+        text="Update"
+        // text={this.state.isEditing ? "Mise à jour" : "Update"}
+        // onClick={this.state.isEditing ?this.Miseajour : this.updateitem}
+        onClick={this.updatePopup}
+        style={{color:"black",display: "inline",marginLeft:"200px" , fontSize:"17px"}}
         allowDisabledFocus
         />
-        <DefaultButton text="Delete"onClick={this._onDeleteRow} style={{background:"#a4373a", color:"white",display: "inline",marginLeft:"200px"}} allowDisabledFocus/>
-        <PrimaryButton  text="View" onClick={this.view}
-        style={{background:"#11255e", color:"white",display: "inline",marginLeft:"200px"}} 
+        <ActionButton iconProps={Delete} aria-label="Delete" text="Delete"onClick={this._onDeleteRow} style={{color:"black",display: "inline",marginLeft:"200px",fontSize : "17px"}} allowDisabledFocus/>
+        <ActionButton iconProps={View} aria-label="View" text="View"  onClick={this.view}
+        style={{ color:"black",display: "inline",marginLeft:"200px",fontSize : "17px"}} 
         allowDisabledFocus/>
         </Stack>
         <Announced message={`Number of items after filter applied: ${items.length}.`} />
@@ -306,16 +344,175 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
           {">>"}
         </IconButton>
         </div>
-        <div className='lowerlist' style={{textAlign : "right" , display : "grid" , width:"70px" , right : '70px'}}>
+        <div className='lowerlist' style={{textAlign : "right" , display : "grid" , width:"70px" , right : '70px' , }}>
         <Dropdown
         style={{fontSize : "18px"}}
         placeholder='5'
         options={options_element}
         onChange = {this.select_element}
         />
-        <ExportCSV csvData={this.state.list} fileName={this.state.fileName} />
-        </div>
+        <br></br>
         {/* <ExportCSV csvData={this.state.list} fileName={this.state.fileName} /> */}
+        </div>
+        {/* create Pop-up avec un button Add  */}
+        {this.state.showPopup &&
+        <Layer>
+          <Popup
+            className={popupStyles.root}
+            role="dialog"
+            aria-modal="true"
+          >
+            <Overlay/>
+            {this.state.showPopup ? (
+            <FocusTrapZone>
+              <div role="document" className={popupStyles.content}>
+                <ActionButton iconProps={AddFriend} aria-label="AddFriend" text='Add Nouvaeu User' style={{textAlign : "center" , fontSize : "18px"}} ></ActionButton>
+            <div className="fields">
+            <Stack {...columnProps} >
+            <TextField label="Name" styles={{fieldGroup:{width : 280}}}
+            placeholder="Entrer First Name"
+            value={this.state.Dateform.name}
+            onChange={(e:any)=>this.setState({Dateform:{...this.state.Dateform,name:e.target.value}})}
+            />
+            </Stack>
+            <Stack {...columnProps} >
+            <TextField label="Prenom" styles={{fieldGroup:{width : 280}}} 
+            placeholder="Entrer First Prenom"
+            value={this.state.Dateform.prenom}
+            onChange={(e:any)=>this.setState({Dateform:{...this.state.Dateform,prenom:e.target.value}})}
+            />
+            </Stack>
+            <Stack {...columnProps} >
+            <TextField label="Age"  styles={{fieldGroup:{width : 280}}} type="number"
+            placeholder="Entrer First Age"
+            value={this.state.Dateform.age.toString()}
+            onChange={(e:any)=>this.setState({Dateform:{...this.state.Dateform,age:e.target.value}})}
+            />
+            </Stack> 
+          </div>
+          <div className="fields">
+            <Stack {...columnProps} >
+            <TextField label="Email" styles={{fieldGroup:{width : 280}}}  
+            placeholder="Entrer First Email"
+            value={this.state.Dateform.email}
+            onChange={(e:any)=>this.setState({Dateform:{...this.state.Dateform,email:e.target.value}})}
+            />
+            </Stack>
+            <Stack tokens={stackTokensD}>
+            <Dropdown
+            placeholder="Select an Ville"
+            label="Ville"
+            options={options}
+            styles={dropdownStyles}
+            onChange={this.getvalueVille}
+            defaultSelectedKey={this.state.Dateform.ville}
+            />
+            </Stack>
+            <Stack>
+            <Stack {...columnProps}>
+            <TextField label="Adresse"  
+            styles={{fieldGroup:{width : 280}}}
+            value={this.state.Dateform.adresse}
+            onChange={(e:any)=>this.setState({Dateform:{...this.state.Dateform,adresse:e.target.value}})}
+            />
+            </Stack>
+            </Stack>
+          </div>
+          <div className="fields">
+            <ChoiceGroup  
+            options={optionssex} label="Sexe" 
+            onChange={this._onChange}
+            />
+          </div>
+          <DefaultButton onClick={this.togglePopup} style={{background:"#a4262c", color:"white",display: "inline" , border : "#a4262c"}}>Close</DefaultButton>
+          <PrimaryButton onClick={this.handleAddClick} style={{display: "inline" , margin : "15px"}}>Save</PrimaryButton>
+          <DefaultButton text="Cancel" onClick={this.ClearForm} style={{background:"white", color:"black",display: "inline" , margin : "3px"}}  allowDisabledFocus/>
+          </div>
+            </FocusTrapZone>
+            ) : null}
+          </Popup>
+        </Layer>
+        ///////
+    }
+    {this.state.upPopup &&
+        <Layer>
+          <Popup
+            className={popupStyles.root}
+            role="dialog"
+            aria-modal="true"
+          >
+            <Overlay/>
+            {this.state.upPopup ? (
+            <FocusTrapZone>
+              <div role="document" className={popupStyles.content}>
+                <ActionButton iconProps={UserSync} aria-label="UserSync" text='Update User' style={{textAlign : "center" , fontSize : "18px"}} ></ActionButton>
+            <div className="fields">
+            <Stack {...columnProps} >
+            <TextField label="Name" styles={{fieldGroup:{width : 280}}}
+            placeholder="Entrer First Name"
+            value={this.state.Dateform.name}
+            onChange={(e:any)=>this.setState({Dateform:{...this.state.Dateform,name:e.target.value}})}
+            />
+            </Stack>
+            <Stack {...columnProps} >
+            <TextField label="Prenom" styles={{fieldGroup:{width : 280}}} 
+            placeholder="Entrer First Prenom"
+            value={this.state.Dateform.prenom}
+            onChange={(e:any)=>this.setState({Dateform:{...this.state.Dateform,prenom:e.target.value}})}
+            />
+            </Stack>
+            <Stack {...columnProps} >
+            <TextField label="Age"  styles={{fieldGroup:{width : 280}}} type="number"
+            placeholder="Entrer First Age"
+            value={this.state.Dateform.age.toString()}
+            onChange={(e:any)=>this.setState({Dateform:{...this.state.Dateform,age:e.target.value}})}
+            />
+            </Stack> 
+          </div>
+          <div className="fields">
+            <Stack {...columnProps} >
+            <TextField label="Email" styles={{fieldGroup:{width : 280}}}  
+            placeholder="Entrer First Email"
+            value={this.state.Dateform.email}
+            onChange={(e:any)=>this.setState({Dateform:{...this.state.Dateform,email:e.target.value}})}
+            />
+            </Stack>
+            <Stack tokens={stackTokensD}>
+            <Dropdown
+            placeholder="Select an Ville"
+            label="Ville"
+            options={options}
+            styles={dropdownStyles}
+            onChange={this.getvalueVille}
+            defaultSelectedKey={this.state.Dateform.ville}
+            />
+            </Stack>
+            <Stack>
+            <Stack {...columnProps}>
+            <TextField label="Adresse"  
+            styles={{fieldGroup:{width : 280}}}
+            value={this.state.Dateform.adresse}
+            onChange={(e:any)=>this.setState({Dateform:{...this.state.Dateform,adresse:e.target.value}})}
+            />
+            </Stack>
+            </Stack>
+          </div>
+          <div className="fields">
+            <ChoiceGroup  
+            options={optionssex} label="Sexe" 
+            onChange={this._onChange}
+            />
+          </div>
+          <DefaultButton onClick={this.updatePopup} style={{background:"#a4262c", color:"white",display: "inline" , border : "#a4262c"}}>Close</DefaultButton>
+          <DefaultButton onClick={this.handleAddClick} style={{display: "inline" , margin : "15px" , background : "#0c5f32", color : "white" , border : "#0c5f32"}}>Mise a jour </DefaultButton>
+          <DefaultButton text="Cancel" onClick={this.ClearForm} style={{background:"white", color:"black",display: "inline" , margin : "3px"}}  allowDisabledFocus/>
+          </div>
+            </FocusTrapZone>
+            ) : null}
+          </Popup>
+        </Layer>
+        ///////
+    }
       </Stack>
     )
   }
@@ -326,10 +523,10 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
     const selectionCount = this._selection.getSelectedCount();
     switch (selectionCount) {
       case 0:
-          return 'No items selected';
+          return '';
       case 1:
         this.setState({selectv:(this._selection.getSelection()[0] as IGetform)})
-        return '1 item selected: ' 
+        return '' 
         + (this._selection.getSelection()[0] as IDetailsListBasicExampleItem).id;
       default:
         return `${selectionCount} items selected`;
@@ -408,14 +605,6 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
         `
     )
   }
-  // componentDidUpdate(prevProps: Readonly<{}>, prevState: Readonly<IDetailsListBasicExampleState>, snapshot?: any): void {
-  //   console.log("componentDidupdate",prevProps,prevState,snapshot)
-  //   if(prevState.list === this.state.list){
-  //     this.setState({
-  //        list:this.state.list
-  //     })
-  //   }
-  // }
   updateitem(){
     // console.log(this.state.selectv)
     this.setState({Dateform:this.state.selectv,isEditing:true})
@@ -477,8 +666,16 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
   suivantelement(){
     this.setState(({count : Math.ceil(this.state.list.length / this.state.todosPerPage )}))
   }
-
-  
+  togglePopup = () => {
+    this.setState({
+      showPopup: !this.state.showPopup,
+    });
+  };
+  updatePopup = () => {
+    this.setState({
+      upPopup: !this.state.upPopup,
+    });
+  };
 }
 
 export default App
