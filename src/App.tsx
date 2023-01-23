@@ -4,7 +4,7 @@ import { TextField, ITextFieldStyles } from '@fluentui/react/lib/TextField';
 import { DetailsList, DetailsListLayoutMode, Selection, IColumn } from '@fluentui/react/lib/DetailsList';
 import { MarqueeSelection } from '@fluentui/react/lib/MarqueeSelection';
 import { mergeStyles } from '@fluentui/react/lib/Styling';
-import { Stack, IStackTokens, List, initializeIcons, IIconProps, Icon } from '@fluentui/react';
+import { Stack, IStackTokens, List, initializeIcons, IIconProps, Icon, styled } from '@fluentui/react';
 import {ActionButton, DefaultButton, PrimaryButton } from '@fluentui/react/lib/Button';
 import {IStackProps, IStackStyles } from '@fluentui/react/lib/Stack';
 import './App.css'
@@ -13,6 +13,11 @@ import { ChoiceGroup, IChoiceGroupOption } from '@fluentui/react/lib/ChoiceGroup
 import { IconButton } from '@fluentui/react/lib/Button';
 import {ExportCSV} from './ExportCSV';
 import { mergeStyleSets,  FocusTrapZone, Layer, Overlay, Popup } from '@fluentui/react';
+import { Dialog, DialogType, DialogFooter } from '@fluentui/react/lib/Dialog';
+const dialogContentProps = {
+  type: DialogType.largeHeader,
+  title: "User Selected",
+};
 const popupStyles = mergeStyleSets({
   root: {
     background: 'rgba(0, 0, 0, 0.2)',
@@ -30,6 +35,8 @@ const popupStyles = mergeStyleSets({
     position: 'absolute',
     top: '50%',
     transform: 'translate(-50%, -50%)',
+    border : '1.5px double #0078d4'
+
   },
 });
 const ChevronLeftSmall: IIconProps = { iconName: 'ChevronLeftSmall' ,};
@@ -54,6 +61,7 @@ const options: IDropdownOption[] = [
   { key: 'tanger', text: 'Tanger' },
   { key: 'oujda', text: 'Oujda' },
   { key: 'khouribga', text: 'Khouribga' },
+  { key: 'Kenitra' , text:'Kenitra'}
 ];
 const stackTokensD: IStackTokens = { childrenGap: 20 };
 const stackTokensT = { childrenGap: 50 };
@@ -114,6 +122,7 @@ export interface IDetailsListBasicExampleState {
   fileName : string
   showPopup : boolean
   upPopup : boolean
+  dialogv : boolean
   // title : string
   // disabled : boolean
   // green : boolean
@@ -156,7 +165,8 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
       count : 1,
       fileName : 'listelement',
       showPopup : false,
-      upPopup : false
+      upPopup : false,
+      dialogv : true
       // title : "Add Nouvaeu User"
       // disabled : false
       // green : true
@@ -167,7 +177,7 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
     this.handleAddClick = this.handleAddClick.bind(this)
     this._onDeleteRow = this._onDeleteRow.bind(this)
     this.ClearForm = this.ClearForm.bind(this)
-    this.view  = this.view.bind(this)
+    // this.view  = this.view.bind(this)
     this.updateitem = this.updateitem.bind(this)
     this.Miseajour = this.Miseajour.bind(this)
     this.handleClick = this.handleClick.bind(this) 
@@ -178,6 +188,7 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
     this.suivantelement = this.suivantelement.bind(this)
     this.togglePopup = this.togglePopup.bind(this)
     this.updatePopup = this.updatePopup.bind(this)
+    this.dialogview = this.dialogview.bind(this)
   }
   public render(): JSX.Element {
     const { items, selectionDetails } = this.state; 
@@ -276,6 +287,7 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
         <TextField
           className={exampleChildClass}
           label="Search"
+          // onChange={this._onFilter}
           onChange={this._onFilter}
           styles={textFieldStyles}
         />
@@ -307,7 +319,7 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
           icon: {color: '#d13438', fontSize: 25},
           }}
         allowDisabledFocus/>
-        <ActionButton iconProps={View} aria-label="View" text="View"  onClick={this.view}
+        <ActionButton iconProps={View} aria-label="View" text="View"  onClick={this.dialogview}
         style={{ color:"black",display: "inline",marginLeft:"200px",fontSize : "17px"}} 
         styles={{
           icon: {color: '#6bb700', fontSize: 25},
@@ -326,7 +338,7 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
             ariaLabelForSelectionColumn="Toggle selection"
             ariaLabelForSelectAllCheckbox="Toggle selection for all items"
             checkButtonAriaLabel="select row"
-            onItemInvoked={this._onItemInvoked}
+            onItemInvoked={this.state.isEditing ? this.updatePopup : this.updateitem}
           />
         </MarqueeSelection>
         <div style={{textAlign: "right"}}>
@@ -381,7 +393,11 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
             {this.state.showPopup ? (
             <FocusTrapZone>
               <div role="document" className={popupStyles.content}>
-                <ActionButton iconProps={AddFriend} aria-label="AddFriend" text='Add Nouvaeu User' style={{textAlign : "center" , fontSize : "18px"}} ></ActionButton>
+                <ActionButton iconProps={AddFriend} aria-label="AddFriend" text='Add Nouvaeu User' style={{fontSize : "17px"}}  
+                styles={{
+                  icon: {color: '#0078d4', fontSize: 25},
+                  }}>
+                </ActionButton>
             <div className="fields">
             <Stack {...columnProps} >
             <TextField label="Name" styles={{fieldGroup:{width : 280}}}
@@ -460,7 +476,11 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
             {this.state.upPopup ? (
             <FocusTrapZone>
               <div role="document" className={popupStyles.content}>
-                <ActionButton iconProps={UserSync} aria-label="UserSync" text='Update User' style={{textAlign : "center" , fontSize : "18px"}} ></ActionButton>
+                <ActionButton iconProps={UserSync} aria-label="UserSync" text='Update User' style={{fontSize : "17px"}} 
+                styles={{
+                  icon: {color: '#742774', fontSize: 25},
+                  }} >
+                  </ActionButton>
             <div className="fields">
             <Stack {...columnProps} >
             <TextField label="Name" styles={{fieldGroup:{width : 280}}}
@@ -498,7 +518,8 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
             label="Ville"
             options={options}
             styles={dropdownStyles}
-            onChange={this.getvalueVille}
+            // onChange={this.getvalueVille}
+            onChange = {this.getvalueVille}
             defaultSelectedKey={this.state.Dateform.ville}
             />
             </Stack>
@@ -528,6 +549,27 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
         </Layer>
         ///////
     }
+    {/* <DefaultButton onClick={this.dialogview} text="View" /> */}
+      <Dialog
+        hidden={this.state.dialogv}
+        onDismiss={this.dialogview}
+        dialogContentProps={dialogContentProps}
+        >
+          <>
+          <h4 style={{ fontFamily : '"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;' , color :"#002050" , textAlign :"center" , borderRadius :"15px"}}>id = {this.state.selectv.id}</h4>
+          <h4 style={{ fontFamily : '"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;' , color :"#002050" , textAlign :"center",borderRadius :"15px"}}>name = {this.state.selectv.name}</h4>
+          <h4 style={{ fontFamily : '"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;' , color :"#002050" , textAlign :"center",borderRadius :"15px"}}>prenom = {this.state.selectv.prenom}</h4>
+          <h4 style={{ fontFamily : '"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;' , color :"#002050" , textAlign :"center",borderRadius :"15px"}}>age = {this.state.selectv.age}</h4>
+          <h4 style={{ fontFamily : '"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;' , color :"#002050" , textAlign :"center",borderRadius :"15px"}}>email = {this.state.selectv.email}</h4>
+          <h4 style={{ fontFamily : '"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;' , color :"#002050" , textAlign :"center",borderRadius :"15px"}}>ville = {this.state.selectv.ville}</h4>
+          <h4 style={{ fontFamily : '"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;' , color :"#002050" , textAlign :"center",borderRadius :"15px"}}>adresse = {this.state.selectv.adresse}</h4>
+          <h4 style={{fontFamily : '"Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;' , color :"#002050" , textAlign :"center",borderRadius :"15px"}}>sexe = {this.state.selectv.sexe}</h4>
+          </>
+        <DialogFooter>
+          
+          <PrimaryButton onClick={this.dialogview} text="OK" />
+        </DialogFooter>
+      </Dialog>
       </Stack>
     )
   }
@@ -548,14 +590,16 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
     }
   }
   private _onFilter = (ev: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, text: string): void => {
-    // this._alllist = this.state.list
     this.setState({
       list : text ? this._alllist.filter(i => i.name.toLowerCase().indexOf(text) > -1) : this._alllist,
     });
   };
-  private _onItemInvoked = (item: IDetailsListBasicExampleItem): void => {
-    alert(`Item invoked: ${item.name}`);
-  };
+  // private _onItemInvoked = (item: IDetailsListBasicExampleItem): void => {
+  //   // alert(`Item invoked: ${item.name}`);
+  //     this.setState({
+  //       upPopup: !this.state.upPopup,
+  //     });
+  // };
   private submitform =(e: { preventDefault: () => void; })=>{
     e.preventDefault()
     const contact = {
@@ -610,20 +654,20 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
       });
     }
   };
-  view(){
-    alert(
-        `
-        id = ${this.state.selectv.id}
-        Name = ${this.state.selectv.name}\n
-        Prenom = ${this.state.selectv.prenom}
-        Email = ${this.state.selectv.email}\n
-        Age = ${this.state.selectv.age}
-        Ville = ${this.state.selectv.ville}\n
-        Adresse = ${this.state.selectv.adresse}
-        Sexe = ${this.state.selectv.sexe}\n
-        `
-    )
-  }
+  // view(){
+  //   alert(
+  //       `
+  //       id = ${this.state.selectv.id}
+  //       Name = ${this.state.selectv.name}\n
+  //       Prenom = ${this.state.selectv.prenom}
+  //       Email = ${this.state.selectv.email}\n
+  //       Age = ${this.state.selectv.age}
+  //       Ville = ${this.state.selectv.ville}\n
+  //       Adresse = ${this.state.selectv.adresse}
+  //       Sexe = ${this.state.selectv.sexe}\n
+  //       `
+  //   )
+  // }
   updateitem(){
     // console.log(this.state.selectv)
     this.setState({Dateform:this.state.selectv,isEditing:true})
@@ -691,6 +735,11 @@ class App extends React.Component<{},IDetailsListBasicExampleState>{
       upPopup: !this.state.upPopup,
     });
   };
+  dialogview=()=>{
+    this.setState({
+      dialogv : !this.state.dialogv,
+    })
+  }
 }
 
 export default App
